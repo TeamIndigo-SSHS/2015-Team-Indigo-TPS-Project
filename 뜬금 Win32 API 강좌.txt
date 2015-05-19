@@ -1,0 +1,106 @@
+   1: // Hello.cpp
+   2: //
+   3: // 마우스 왼쪽 버튼 테스트하는 프로그램이다.
+   4: 
+   5: #include <windows.h> // 윈도우즈 프로그램을 작성하는데 필요한 구조체,
+   6:                      // 각종 API 함수, 매크로, 메시지 등이 선언된 헤더 파일로
+   7:                      // 윈도우즈 프로그램에 반드시 포함해야 한다.
+   8: HINSTANCE g_hInst; // 인스턴스 핸들을 저장하기 위한 전역변수 
+   9:                        
+  10: LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+  11:                      // 윈도우 프로시저(Window Procedure)에 대한 선언
+  12: 
+  13:                      // WinMain() : 윈도우즈 어플리케이션의 진입점(entry point)
+  14:                      // 여기서 프로그램이 시작한다. 
+  15:                      // 콘솔 기반 C프로그램의 main()에 해당한다.
+  16: int APIENTRY WinMain( HINSTANCE hInstance,
+  17:                       HINSTANCE hPrevInstance,
+  18:                       LPTSTR lpCmdLine, 
+  19:                       int nCmdShow)
+  20: {
+  21:   static char szClassName[]  = "Hello";   // 윈도우 클래스 이름
+  22:   static char szTitle[] = "안녕하세요!";    // 타이틀바에 출력될 문자열
+  23: 
+  24:   MSG         msg;   	// 메시지 구조체
+  25:   HWND        hWnd;  	// 윈도우 핸들
+  26:   WNDCLASSEX    wc;  	// 윈도우클래스 구조체 
+  27:   g_hInst=hInstance;  	// 인스턴스 핸들 저장                       
+  28:   /////////1 윈도우클래스 구조체에 값을 지정한다. ////////////////////
+  29:   wc.cbSize=sizeof(WNDCLASSEX);        //윈도우 클래스 구조체의 크기
+  30:   wc.style         = CS_HREDRAW | CS_VREDRAW;    	// 클래스 스타일
+  31:   // 윈도우 프로시저를 윈도우클래스 구조체에 등록 
+  32:   wc.lpfnWndProc   = WndProc;        // 윈도우 프로시저 지정, 85번째 줄
+  33:   wc.cbClsExtra    = 0;               // 윈도우클래스 데이터 영역
+  34:   wc.cbWndExtra    = 0;               // 윈도우의 데이터 영역
+  35:   wc.hInstance     = hInstance;      // 인스턴스 핸들
+  36:   wc.hIcon         = LoadIcon(NULL,IDI_APPLICATION);// 아이콘 핸들
+  37:   wc.hCursor       = LoadCursor(NULL,IDC_ARROW);    // 사용할 커서 핸들
+  38:   wc.hbrBackground=(HBRUSH)GetStockObject(WHITE_BRUSH);//바탕색브러시 
+  39:   wc.lpszMenuName  = NULL;                          	// 메뉴 이름            
+  40:   wc.lpszClassName = szClassName;  // 윈도우 클래스 이름, 21번째 줄      
+  41:   wc.hIconSm=LoadIcon(NULL,IDI_APPLICATION);    	//작은 아이콘 핸들
+  42:   
+  43:   ///////////////////// 2 윈도우 클래스를 등록한다. 
+  44: 
+  45:   RegisterClassEx(&wc); // 윈도우 클래스를 등록
+  46: 
+  47:   ///////////////////// 3 프레임 윈도우를 생성한다. 
+  48:     
+  49:   hWnd = CreateWindow( 
+  50:               szClassName,  // 윈도우 클래스 이름, 21번째 줄
+  51:               szTitle,               	// 타이틀바에 출력될 문자열 
+  52:               WS_OVERLAPPEDWINDOW,	// 윈도우 스타일
+  53:               CW_USEDEFAULT,         	// 윈도우의 좌측 상단의 X좌표
+  54:               CW_USEDEFAULT,         	// 윈도우의 좌측 상단의 Y좌표
+  55:               CW_USEDEFAULT,         	// 윈도우의 폭
+  56:               CW_USEDEFAULT,         	// 윈도우의 높이
+  57:               NULL,                  	// 부모 윈도우의 핸들
+  58:               NULL,                  	// 메뉴 혹은 자식 윈도우의 식별자
+  59:               hInstance, //윈도우를 생성한 인스턴스 핸들,WinMain의 첫 번째 인자
+  60:               NULL              // CREATESTRUCT구조체를 통해 전달되는 값
+  61:          );
+  62: 
+  63:   if ( !hWnd )         	// 윈도우 생성에 실패하면 
+  64:     return( FALSE ); 	// 프로그램을 종료한다.
+  65: 
+  66:   ////////////////////// 4 프레임 윈도우를 화면에 나타낸다.
+  67: 
+  68:   ShowWindow(hWnd, nCmdShow);	// 윈도우를 화면에 나타낸다.
+  69:   UpdateWindow(hWnd);          	// 윈도우의 클라이언트 영역을 칠한다.        
+  70: 
+  71:  /////// 5.메시지 루프:루프를 돌며 메시지 큐로부터 메시지를 얻어와 처리한다.
+  72: 
+  73:   while( GetMessage( &msg, NULL, 0, 0) )   
+  74:   {
+  75:     TranslateMessage( &msg );	// 키보드 메시지를 번역
+  76:     DispatchMessage( &msg );  	// 메시지를 해당 윈도우 프로시저로 보낸다.
+  77:   }
+  78:   return msg.wParam;       
+  79: }
+  80: 
+  81: 
+  82: /////////////////////// 윈도우 프로시저 (Window Procedure) 
+  83: 
+  84: ////////////////  윈도우 프로시저함수의 정의 부분  
+  85: LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, 
+                            WPARAM wParam, LPARAM lParam)
+  86: {
+  87:    // switch-case문을 써서 메시지의 종류에 따라
+  88:    // 적절한 작업을 수행한다.
+  89:    
+  90:    switch ( uMsg ) 
+  91:    {
+  92:       case WM_LBUTTONDOWN: // 마우스 좌측 버튼을 누른 경우
+  93:         MessageBox(hWnd, "마우스 좌측 버튼을 눌렀습니다",
+               	             "마우스 테스트 ", MB_OK);
+  94:       break;
+  95:       case WM_DESTROY:	  // 프로그램을 종료하는 경우
+  96:         PostQuitMessage(0); // WM_QUIT메시지를 발생시켜 메시지 루프를 중단한다.
+  97:       break;
+  98: 
+  99:       default :             // 처리하지 않은 메시지는 DefWindowProc()가 처리
+ 100:        return DefWindowProc( hWnd, uMsg, wParam, lParam );
+ 101:                           
+ 102:    }
+ 103:    return 0;
+ 104: }
