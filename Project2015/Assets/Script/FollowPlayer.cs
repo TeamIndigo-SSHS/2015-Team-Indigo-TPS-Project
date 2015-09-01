@@ -9,10 +9,12 @@ public class FollowPlayer : MonoBehaviour {
 	
 	void Awake () {
 		displacement=new Vector3(0,0,0);
-		player = GameObject.FindGameObjectWithTag("Player").transform;;
+		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 
 	void FixedUpdate () {
 		transform.position=player.position+displacement;
+
+
 	}
 }
